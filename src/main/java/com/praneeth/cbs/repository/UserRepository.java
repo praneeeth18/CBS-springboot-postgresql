@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.praneeth.cbs.model.User;
 
 @Repository
-public interface UserRespository extends JpaRepository<Integer, User> {
+public interface UserRepository extends JpaRepository<User, Integer> {
+
 
 }
