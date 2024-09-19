@@ -1,11 +1,14 @@
 package com.praneeth.cbs.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.praneeth.cbs.dto.UserRequestDTO;
 import com.praneeth.cbs.dto.UserResponseDTO;
+import com.praneeth.cbs.exception.ResourceNotFoundException;
+import com.praneeth.cbs.exception.UserAlreadyExistsException;
 import com.praneeth.cbs.mapper.UserMapper;
 import com.praneeth.cbs.model.User;
 import com.praneeth.cbs.repository.UserRepository;
@@ -20,7 +23,11 @@ public class UserServiceImpl implements UserService {
 	private final UserMapper userMapper;
 
 	@Override
-	public UserResponseDTO createUser(UserRequestDTO request) {
+	public UserResponseDTO createUser(UserRequestDTO request) throws UserAlreadyExistsException {
+		Optional<User> duplicateUser = userRepository.findByEmail(request.email());
+		if(duplicateUser.isPresent()) {
+			throw new UserAlreadyExistsException("User already exists with email: " + request.email());
+		}
 		User user = userRepository.save(userMapper.toUser(request));
 		return userMapper.toUserDTO(user);
 	}
@@ -34,11 +41,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserResponseDTO> findByUserId(Integer userId) {
-		return userRepository.findById(userId)
-				.stream()
-				.map(userMapper::toUserDTO)
-				.toList();
+	public UserResponseDTO findByEmail(String email) throws ResourceNotFoundException {
+		User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+		UserResponseDTO userResponseDTO = userMapper.toUserDTO(user);
+		return userResponseDTO;
 	}
 
 	@Override
@@ -52,5 +58,7 @@ public class UserServiceImpl implements UserService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
 
 }

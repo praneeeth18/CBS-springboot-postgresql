@@ -1,9 +1,12 @@
 package com.praneeth.cbs.mapper;
 
+import org.springframework.stereotype.Service;
+
 import com.praneeth.cbs.dto.UserRequestDTO;
 import com.praneeth.cbs.dto.UserResponseDTO;
 import com.praneeth.cbs.model.User;
 
+@Service
 public class UserMapper {
 	
 	public User toUser(UserRequestDTO user) {
